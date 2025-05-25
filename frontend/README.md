@@ -1,3 +1,20 @@
+# Frontend (React)
+
+This directory contains the React frontend for the Ladder League app.
+
+- Modern React app (TypeScript) for ladder league management.
+- Animated UI, leaderboard, score entry, and more.
+
+## Running the Frontend
+
+```sh
+npm install
+npm start
+```
+
+- The frontend will be available at http://localhost:3000
+- Make sure the backend is running at http://localhost:8000 for API access.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
