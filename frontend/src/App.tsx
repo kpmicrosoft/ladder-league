@@ -17,17 +17,18 @@ function Welcome({ onLogin }: { onLogin: (mobile: string) => void }) {
   };
   return (
     <div className="welcome-page">
-      <h1>Welcome to Ladder League!</h1>
-      <p>This is a modern web application for managing your ladder league. Get started by logging in.</p>
-      <input
-        type="tel"
-        placeholder="Enter your mobile number"
-        value={mobile}
-        onChange={e => setMobile(e.target.value)}
-        onKeyDown={handleKeyDown}
-        style={{ padding: '8px', fontSize: '1rem', marginTop: '1rem' }}
-      />
-      <button onClick={handleClick} style={{ marginLeft: 8, padding: '8px 16px', fontSize: '1rem' }}>Enter</button>
+      <h1>Welcome to Ladder League</h1>
+      <p>This is a modern web application for managing your ladder league. Get started by logging in with your mobile number.</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <input
+          type="tel"
+          placeholder="Enter your mobile number"
+          value={mobile}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMobile(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <button onClick={handleClick}>Enter</button>
+      </div>
     </div>
   );
 }
@@ -245,7 +246,7 @@ function Leaderboard({ league, onHome, onLogout, onAddScore }: { league: string;
       <LogoutButton onLogout={onLogout} />
       <h2 style={{ textAlign: 'center', marginBottom: 24 }}>{league} Leaderboard</h2>
       <div style={{ margin: '16px 0', textAlign: 'center' }}>
-        <a href="#" onClick={e => { e.preventDefault(); onAddScore(); }} style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
+        <a href="#" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => { e.preventDefault(); onAddScore(); }} style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
           + Add Score
         </a>
       </div>
@@ -572,48 +573,58 @@ function App() {
   const [showSignup, setShowSignup] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [showAllUsers, setShowAllUsers] = useState(false);
-  const [showAddScore, setShowAddScore] = useState(false);
-
-  // Simulate backend user storage in localStorage (replace with API calls to backend for real app)
-  const saveUser = (user: { phone: string; firstName: string; lastName: string }) => {
-    let users = JSON.parse(localStorage.getItem('ladder_users') || '[]');
-    users.push(user);
-    localStorage.setItem('ladder_users', JSON.stringify(users));
-  };
-  const findUser = (phone: string) => {
-    let users = JSON.parse(localStorage.getItem('ladder_users') || '[]');
-    return users.find((u: any) => u.phone === phone);
-  };
-
-  const handleSignup = (user: { phone: string; firstName: string; lastName: string }) => {
-    if (findUser(user.phone)) {
-      alert('User already exists. Please log in.');
-      setShowSignup(false);
-      setShowLogin(true);
-      return;
+  const [showAllUsers, setShowAllUsers] = useState(false);  const [showAddScore, setShowAddScore] = useState(false);
+  const handleSignup = async (user: { phone: string; firstName: string; lastName: string }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user)
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.user);
+        setMobile(user.phone);
+        setLoggedIn(true);
+        setShowSignup(false);
+        setShowLogin(false);
+      } else {
+        alert(data.message || 'Signup failed. Please try again.');
+        if (data.message && data.message.includes('already exists')) {
+          setShowSignup(false);
+          setShowLogin(true);
+        }
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('Signup failed. Please try again.');
     }
-    saveUser(user);
-    setUser(user);
-    setMobile(user.phone);
-    setLoggedIn(true);
-    setShowSignup(false);
-    setShowLogin(false);
   };
-
-  const handleLogin = (phone: string) => {
-    const user = findUser(phone);
-    if (!user) {
-      alert('User not found. Please sign up.');
-      setShowSignup(true);
-      setShowLogin(false);
-      return;
+  const handleLogin = async (phone: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.user);
+        setMobile(phone);
+        setLoggedIn(true);
+        setShowSignup(false);
+        setShowLogin(false);
+      } else {
+        alert('User not found. Please sign up.');
+        setShowSignup(true);
+        setShowLogin(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
     }
-    setUser(user);
-    setMobile(phone);
-    setLoggedIn(true);
-    setShowSignup(false);
-    setShowLogin(false);
   };
 
   const handleEnterLeague = (league: string) => {
@@ -684,17 +695,31 @@ function App() {
   return (
     <div className="App">
       {renderUserName()}
-      {loggedIn && user && <LogoutButton onLogout={handleLogout} />}
-      {!loggedIn ? (
+      {loggedIn && user && <LogoutButton onLogout={handleLogout} />}      {!loggedIn ? (
         <>
           <Welcome onLogin={handleLogin} />
-          <div style={{ marginTop: 24, textAlign: 'center' }}>
-            <button onClick={() => setShowAllUsers(true)} style={{ fontSize: '1rem', padding: '8px 16px' }}>
+          <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+            <button 
+              onClick={() => setShowAllUsers(true)} 
+              style={{ 
+                fontSize: '1rem', 
+                padding: '10px 20px',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5a6268'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#6c757d'}
+            >
               View All Signed Up Users
             </button>
           </div>
         </>
-      ) : currentLeague ? (
+      ): currentLeague ? (
         <Leaderboard league={currentLeague} onHome={handleHome} onLogout={handleLogout} onAddScore={() => setShowAddScore(true)} />
       ) : (
         <TournamentList mobile={mobile} onEnterLeague={handleEnterLeague} />

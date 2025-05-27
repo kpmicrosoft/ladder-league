@@ -9,11 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Ensure data directories exist
-RUN mkdir -p /app/data/scores
-
-# Set environment variable for data directory
-ENV LADDER_LEAGUE_DATA_DIR=/app/data
+# Set environment variable for data directory (will be overridden by container app)
+ENV LADDER_LEAGUE_DATA_DIR=/mnt/data
 
 EXPOSE 8000
 

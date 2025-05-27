@@ -37,6 +37,18 @@
   }
 }
 
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 body, .App, .welcome-page, .signup-page, .login-page, .tournament-list, .leaderboard, .all-users-page, .add-score-page {
   min-height: 100vh;
   min-width: 100vw;
@@ -53,4 +65,74 @@ body, .App, .welcome-page, .signup-page, .login-page, .tournament-list, .leaderb
 .App, .welcome-page, .signup-page, .login-page, .tournament-list, .leaderboard, .all-users-page, .add-score-page {
   position: relative;
   z-index: 1;
+}
+
+/* Home page centering */
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Welcome page styling */
+.welcome-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.welcome-page h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #333;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  font-weight: bold;
+}
+
+.welcome-page p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.welcome-page input {
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  margin-right: 10px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  min-width: 200px;
+}
+
+.welcome-page input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.welcome-page button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 600;
+}
+
+.welcome-page button:hover {
+  background-color: #0056b3;
 }

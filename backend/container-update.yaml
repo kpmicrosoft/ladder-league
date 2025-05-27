@@ -1,0 +1,29 @@
+configuration:
+  ingress:
+    external: true
+    targetPort: 8000
+    allowInsecure: false
+    traffic:
+    - weight: 100
+      latestRevision: true
+  registries:
+  - server: ladderleagueregistry.azurecr.io
+    username: ladderleagueregistry
+template:
+  containers:
+  - name: ladder-league-api
+    image: ladderleagueregistry.azurecr.io/ladder-league-api:latest
+    env:
+    - name: LADDER_LEAGUE_DATA_DIR
+      value: /mnt/data    volumeMounts:
+    - volumeName: data
+      mountPath: /mnt/data
+    resources:
+      cpu: 0.5
+      memory: 1Gi
+  scale:
+    minReplicas: 1
+    maxReplicas: 3  volumes:
+  - name: data
+    storageType: AzureFile
+    storageName: ladder-data-storage

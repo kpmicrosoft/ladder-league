@@ -1,0 +1,31 @@
+{
+  "properties": {
+    "template": {
+      "containers": [
+        {
+          "name": "ladder-league-api",
+          "image": "ladderleagueregistry.azurecr.io/ladder-league-api:latest",
+          "env": [
+            {
+              "name": "LADDER_LEAGUE_DATA_DIR",
+              "value": "/app/data"
+            }
+          ],
+          "volumeMounts": [
+            {
+              "volumeName": "data-volume",
+              "mountPath": "/app/data"
+            }
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "name": "data-volume",
+          "storageType": "AzureFile",
+          "storageName": "ladder-data-storage"
+        }
+      ]
+    }
+  }
+}
