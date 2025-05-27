@@ -3,6 +3,137 @@ import logo from './logo.svg';
 import './App.css';
 import { API_BASE_URL } from './config';
 
+// Scoring Info Component
+function ScoringInfo({ league }: { league: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Determine sport from league name
+  const sport = league.toLowerCase().includes('tennis') ? 'Tennis' :
+                league.toLowerCase().includes('badminton') ? 'Badminton' :
+                league.toLowerCase().includes('pickleball') ? 'Pickleball' : 'Tennis';
+  
+  const getScoringRules = () => {
+    switch (sport) {
+      case 'Tennis':
+        return {
+          title: 'Tennis Scoring Rules',
+          rules: [
+            '📊 **Points System**: Earn points equal to games won in each set',
+            '🎾 **3 Sets Format**: Play best of 3 sets, points = total games won across all sets',
+            '⚡ **2 Sets + Tiebreaker**: Play 2 sets, then tiebreaker if tied',
+            '🏆 **Tiebreaker Bonus**: Winner gets 6 points, loser gets 0 points',
+            '📈 **Rankings**: Players ranked by total points accumulated',
+            '📅 **Recent Form**: Last 5 match results shown (W/L indicators)'
+          ]
+        };
+      case 'Badminton':
+        return {
+          title: 'Badminton Scoring Rules',
+          rules: [
+            '📊 **Points System**: Earn points equal to your match score',
+            '🏸 **Match Format**: Single game matches to 21 points',
+            '📈 **Rankings**: Players ranked by total points accumulated',
+            '📅 **Recent Form**: Last 5 match results shown (W/L indicators)',
+            '🏆 **Win Bonus**: Additional ranking consideration for match wins'
+          ]
+        };
+      case 'Pickleball':
+        return {
+          title: 'Pickleball Scoring Rules',
+          rules: [
+            '📊 **Points System**: Earn points equal to your match score',
+            '🏓 **Match Format**: Games typically played to 11 points (win by 2)',
+            '📈 **Rankings**: Players ranked by total points accumulated',
+            '📅 **Recent Form**: Last 5 match results shown (W/L indicators)',
+            '🏆 **Win Bonus**: Additional ranking consideration for match wins'
+          ]
+        };
+      default:
+        return {
+          title: 'General Scoring Rules',
+          rules: [
+            '📊 **Points System**: Earn points based on your performance',
+            '📈 **Rankings**: Players ranked by total points accumulated',
+            '📅 **Recent Form**: Last 5 match results shown (W/L indicators)'
+          ]
+        };
+    }
+  };
+
+  const scoringInfo = getScoringRules();
+
+  return (
+    <div style={{ 
+      margin: '16px auto', 
+      maxWidth: '800px', 
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+      border: '2px solid #dee2e6',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+    }}>
+      <div 
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          padding: '12px 20px',
+          background: 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+          color: 'white',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontWeight: 'bold',
+          fontSize: '1.1rem',
+          transition: 'background 0.3s ease'
+        }}
+      >
+        <span>🏆 How Scoring Works - {scoringInfo.title}</span>
+        <span style={{ fontSize: '1.2rem', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}>
+          ▼
+        </span>
+      </div>
+      
+      {isExpanded && (
+        <div style={{ padding: '20px' }}>
+          <div style={{ 
+            display: 'grid', 
+            gap: '12px',
+            fontSize: '0.95rem',
+            lineHeight: '1.4'
+          }}>
+            {scoringInfo.rules.map((rule, index) => (
+              <div key={index} style={{
+                padding: '8px 12px',
+                background: 'white',
+                borderRadius: '8px',
+                border: '1px solid #e9ecef',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+              }}>
+                {rule.split('**').map((part, i) => 
+                  i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {sport === 'Tennis' && (
+            <div style={{ 
+              marginTop: '16px', 
+              padding: '12px', 
+              background: '#fff3cd', 
+              border: '1px solid #ffeaa7',
+              borderRadius: '8px',
+              fontSize: '0.9rem'
+            }}>
+              <strong>💡 Example:</strong> In a 3-set match with scores 6-4, 3-6, 6-2, Player 1 gets 15 points (6+3+6) and Player 2 gets 12 points (4+6+2).
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Welcome({ onLogin }: { onLogin: (mobile: string) => void }) {
   const [mobile, setMobile] = useState('7327184414');
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -244,12 +375,12 @@ function Leaderboard({ league, onHome, onLogout, onAddScore }: { league: string;
     <div className="leaderboard">
       <HomeButton onHome={onHome} />
       <LogoutButton onLogout={onLogout} />
-      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>{league} Leaderboard</h2>
-      <div style={{ margin: '16px 0', textAlign: 'center' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: 24 }}>{league} Leaderboard</h2>      <div style={{ margin: '16px 0', textAlign: 'center' }}>
         <a href="#" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => { e.preventDefault(); onAddScore(); }} style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#007bff', textDecoration: 'underline', cursor: 'pointer' }}>
           + Add Score
         </a>
       </div>
+      <ScoringInfo league={league} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <table style={{ width: 'auto', borderCollapse: 'collapse', minWidth: 600, background: 'rgba(255,255,255,0.95)', borderRadius: 8, boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}>
           <thead>
