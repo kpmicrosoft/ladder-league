@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { API_BASE_URL } from './config';
 
 function Welcome({ onLogin }: { onLogin: (mobile: string) => void }) {
   const [mobile, setMobile] = useState('7327184414');
@@ -35,13 +36,12 @@ function TournamentList({ mobile, onEnterLeague }: { mobile: string; onEnterLeag
   const [tournaments, setTournaments] = useState<{ sport: string; leagues: string[] }[]>([]);
   const [joinedLeagues, setJoinedLeagues] = useState<string[]>([]);
   const [user, setUser] = useState<any>(null);
-
   useEffect(() => {
-    fetch('http://localhost:8000/api/leagues')
+    fetch(`${API_BASE_URL}/api/leagues`)
       .then(res => res.json())
       .then(data => setTournaments(data));
     // Fetch user info from backend
-    fetch(`http://localhost:8000/api/login`, {
+    fetch(`${API_BASE_URL}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone: mobile })
@@ -51,14 +51,14 @@ function TournamentList({ mobile, onEnterLeague }: { mobile: string; onEnterLeag
         if (data.success) setUser(data.user);
       });
     // Fetch joined leagues for the user from backend
-    fetch(`http://localhost:8000/api/user-leagues?phone=${mobile}`)
+    fetch(`${API_BASE_URL}/api/user-leagues?phone=${mobile}`)
       .then(res => res.json())
       .then(data => setJoinedLeagues(Array.isArray(data) ? data : []));
   }, [mobile]);
 
   const handleJoin = (league: string) => {
     if (!user) return;
-    fetch('http://localhost:8000/api/join-league', {
+    fetch(`${API_BASE_URL}/api/join-league`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ league, user })
@@ -116,13 +116,12 @@ function HomeButton({ onHome }: { onHome: () => void }) {
 
 function Leaderboard({ league, onHome, onLogout, onAddScore }: { league: string; onHome: () => void, onLogout: () => void, onAddScore: () => void }) {
   const [members, setMembers] = useState<any[]>([]);
-  const [results, setResults] = useState<any[]>([]);
-  useEffect(() => {
-    fetch(`http://localhost:8000/api/league-members?league=${encodeURIComponent(league)}`)
+  const [results, setResults] = useState<any[]>([]);  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/league-members?league=${encodeURIComponent(league)}`)
       .then(res => res.json())
       .then(data => setMembers(data));
     // Fetch scores for this league
-    fetch(`http://localhost:8000/api/league-scores?league=${encodeURIComponent(league)}`)
+    fetch(`${API_BASE_URL}/api/league-scores?league=${encodeURIComponent(league)}`)
       .then(res => res.json())
       .then(data => setResults(Array.isArray(data) ? data : []));
   }, [league]);
@@ -319,7 +318,7 @@ function Signup({ onSignup, onSwitchToLogin }: { onSignup: (user: { phone: strin
     }
     setError('');
     // Call backend API
-    const res = await fetch('http://localhost:8000/api/signup', {
+    const res = await fetch(`${API_BASE_URL}/api/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, firstName, lastName })
@@ -387,7 +386,7 @@ function Login({ onLogin, onSwitchToSignup, onShowAllUsers }: { onLogin: (phone:
 function AllUsers({ onBack, onHome, onLogout }: { onBack: () => void, onHome: () => void, onLogout: () => void }) {
   const [users, setUsers] = useState<any[]>([]);
   useEffect(() => {
-    fetch('http://localhost:8000/api/all-users')
+    fetch(`${API_BASE_URL}/api/all-users`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch users');
         return res.json();
@@ -437,7 +436,7 @@ function AddScorePage({ league, onBack, onLogout }: { league: string; onBack: ()
   const [matchDate, setMatchDate] = useState<string>(new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/league-members?league=${encodeURIComponent(league)}`)
+    fetch(`${API_BASE_URL}/api/league-members?league=${encodeURIComponent(league)}`)
       .then(res => res.json())
       .then(data => setPlayers(data));
   }, [league]);
@@ -468,7 +467,7 @@ function AddScorePage({ league, onBack, onLogout }: { league: string; onBack: ()
       scores,
       date: matchDate
     };
-    const res = await fetch('http://localhost:8000/api/add-score', {
+    const res = await fetch(`${API_BASE_URL}/api/add-score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(scoreData)

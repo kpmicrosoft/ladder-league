@@ -1,0 +1,7 @@
+version: 1.0
+appservice:
+  platform:
+    name: python
+    version: "3.11"
+  startup:
+    command: startup.sh
